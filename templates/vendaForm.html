@@ -1,0 +1,27 @@
+{% extends "template.html" %}
+{% block conteudo %}
+    <hr>
+    <h3>Nova venda</h3>
+      <form action="criar" method="post">
+        <fieldset>
+          <div class="form-group">
+            <label for="nome">Data</label>
+            <input type="text" id="nome" name="nome" class="form-control">
+          </div>
+          <div class="form-group">
+            <label for="preco">Preço</label>
+            <input type="text" id="preco" name="preco" class="form-control">
+          </div>
+          <div class="form-group">
+            <label for="descricao">Descricao</label>
+            <input type="text" id="descricao" name="descricao" class="form-control">
+          </div>
+          <div class="form-group">
+            <label for="console">Unid. de venda</label>
+            <input type="text" id="unid" name="unid" class="form-control">
+          </div>
+          <button type="submit" class="btn btn-primary btn-salvar">Salvar</button>
+          <button type="submit" class="btn btn-secondary btn-salvar">Cancelar</button>
+        </fieldset>
+      </form>
+      {% endblock %}
