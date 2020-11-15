@@ -1,0 +1,30 @@
+{% extends "template.html" %}
+{% block conteudo %}
+<h3>Usuarios</h3>
+<table class="table table-borderless">
+  <thead>
+    <tr>
+      <th scope="col">Nome</th>
+      <th scope="col">E-mail</th>
+      <th scope="col">CPF</th>
+      <th scope="col">Endereço</th>
+      <th scope="col">Telefone</th>
+      <th scope="col">Tipo</th>
+    </tr>
+  </thead>
+  <tbody>
+         {% for usuario in usuarios %}
+        <tr>
+            <td>{{usuario.nome}}</td>
+            <td>{{usuario.email}}</td>
+            <td>{{usuario.cpf}}</td>
+            <td>{{usuario.endereco}}</td>
+            <td>{{usuario.telefone}}</td>
+            <td>{{usuario.tipo}}</td>
+            <td><a href="{{url_for('usuarioDelete', id=usuario.id)}}">Deletar</a></td> 
+        </tr>
+        {% endfor %} 
+  </tbody>
+</table>
+
+{% endblock %}
