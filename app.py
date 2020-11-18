@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request,  session, flash, url_for,redirect
 from flask_sqlalchemy import SQLAlchemy
+from models.Produto import Produto
 
 
 app = Flask(__name__)
@@ -21,6 +22,8 @@ class Usuario(db.Model):
     cpf = db.Column(db.String(11), nullable=False)
     tipo = db.Column(db.Integer, nullable=False)
 
+    
+
     def __str__(self):
         return self.nome
 
@@ -28,6 +31,8 @@ db.create_all()
 
 if __name__ == "__name__":
     app.run(debug=True)
+
+
 
 @app.route('/usuarioList')
 def usuarioList():
@@ -37,6 +42,7 @@ def usuarioList():
     usuarios = Usuario.query.all()
     return render_template('usuarioList.html', usuarios = usuarios)
 
+
 @app.route('/usuario/delete/<int:id>')
 def usuarioDelete(id):
     usuario = Usuario.query.filter_by(id=id).first()
@@ -44,6 +50,11 @@ def usuarioDelete(id):
     db.session.commit()
     usuarios = Usuario.query.all()
     return redirect(url_for('usuarioList'))
+
+@app.route('/usuario/update/<int:id>')
+def usuarioUpdate(id):
+    usuario = Usuario.query.filter_by(id=id).first()
+    return render_template('usuarioForm.html', usuario = usuario)
 
 @app.route('/produtoForm')
 def produtoForm():
@@ -64,7 +75,12 @@ def produtoForm():
 
 @app.route('/produtoList')
 def produtoList():
-    return render_template('produtoList.html')
+    produto = Produto.query.filter_by(id=id).first()
+    return render_template('produtoList.html', usuarios = usuarios)
+
+@app.route('/produtoUpdate')
+def produtoUpdate(id):
+    return render_template('produtoForm.html', produto = produto)
 
 @app.route('/')
 def home():

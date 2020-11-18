@@ -1,33 +1,32 @@
 {% extends "template.html" %}
 {% block conteudo %}
+
+
 <h3>Lista de produtos já cadastrados</h3>
 <table class="table table-borderless">
   <thead>
+    <link rel="stylesheet" type="text/css" href="static/liststyle.css" media="screen" />
     <tr>
-      <th scope="col">#</th>
-      <th scope="col">First</th>
-      <th scope="col">Last</th>
-      <th scope="col">Handle</th>
+      <th scope="col">ID</th>
+      <th scope="col">Nome do Produto</th>
+      <th scope="col">Preço</th>
+      <th scope="col">Unidade de Venda</th>
     </tr>
   </thead>
   <tbody>
+
+    {% for produto in produtos %}
     <tr>
-      <th scope="row">1</th>
-      <td>Mark</td>
-      <td>Otto</td>
-      <td>@mdo</td>
+        <td>{{produto.nome}}</td>
+        <td>{{produto.preco}}</td>
+        <td>{{produto.descricao}}</td>
+        <td>{{produto.unid}}</td>
+        <td><a href="{{url_for('produtoUpdate')}}">Alterar</a></td> 
+        <td><a href="{{url_for('produtoDelete', id=produto.id)}}">Deletar</a></td> 
+
     </tr>
-    <tr>
-      <th scope="row">2</th>
-      <td>Jacob</td>
-      <td>Thornton</td>
-      <td>@fat</td>
-    </tr>
-    <tr>
-      <th scope="row">3</th>
-      <td colspan="2">Larry the Bird</td>
-      <td>@twitter</td>
-    </tr>
+    {% endfor %} 
+
   </tbody>
 </table>
 
