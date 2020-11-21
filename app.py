@@ -88,8 +88,6 @@ class Pedido(db.Model):
 if __name__ == "__name__":
     app.run(debug=True)
 
-
-
 @app.route('/usuarioList')
 def usuarioList():
     usuarios = Usuario.query.all()
@@ -168,12 +166,11 @@ def produtoForm():
 
 @app.route('/produtoList')
 def produtoList():
-    produto = Produto.query.filter_by(id=id).first()
-    return render_template('produtoList.html', usuarios = usuarios)
+    return render_template('produtoList.html', produto = produtolista)
 
 @app.route('/produtoUpdate')
 def produtoUpdate(id):
-    return render_template('produtoForm.html', produto = produto)
+    return render_template('produtoForm.html', produto = produtolista)
 
 @app.route('/')
 def home():
