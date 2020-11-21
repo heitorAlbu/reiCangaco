@@ -1,16 +1,20 @@
-from flask import Flask, render_template, request,  session, flash, url_for,redirect
+from flask import Flask, render_template, request,  session, flash, url_for,redirect, flash
 from flask_sqlalchemy import SQLAlchemy
 from models.Produto import Produto
-from flask_login import LoginManager, UserMixin
+from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user
+from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
-app.secret_key = 'reiDoCangaco'
-
+#app.secret_key = 'reiDoCangaco'
+app.config["SECRET_KEY"] = 'secret'
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///db.master' 
 db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 
+@login_manager.user_loader
+def current_user(user_id):
+    return Usuario.query.get(user_id)
 
 venda_produto = db.Table('venda_produto',
     db.Column('venda_id', db.Integer, db.ForeignKey('venda.id')),
@@ -21,10 +25,6 @@ pedido_produto = db.Table('pedido_produto',
     db.Column('pedido_id', db.Integer, db.ForeignKey('pedido.id')),
     db.Column('produto_id', db.Integer, db.ForeignKey('produto.id'))
 )
-
-@login_manager.user_loader
-def current_user(user_id):
-    return Usuario.query.get(user_id)
 
 class Usuario(db.Model, UserMixin):
     __tablename__ = "usuarios"
@@ -88,9 +88,8 @@ class Pedido(db.Model):
 if __name__ == "__name__":
     app.run(debug=True)
 
-
-
 @app.route('/usuarioList')
+@login_required
 def usuarioList():
     usuarios = Usuario.query.all()
     return render_template('usuarioList.html', usuarios = usuarios)
@@ -102,7 +101,7 @@ def usuarioRegister():
         usuario = Usuario()
         usuario.nome = request.form["nome"]
         usuario.email = request.form["email"]
-        usuario.senha = request.form["senha"]
+        usuario.senha = generate_password_hash(request.form["senha"])
         usuario.endereco = request.form["endereco"]
         usuario.telefone = request.form["telefone"]
         usuario.cpf = request.form["cpf"]
@@ -118,6 +117,7 @@ def usuarioRegister():
         return render_template('usuarioForm.html', usuario=usuario)
 
 @app.route('/usuario/delete/<int:id>')
+@login_required
 def usuarioDelete(id):
     usuario = Usuario.query.filter_by(id=id).first()
     db.session.delete(usuario)
@@ -126,6 +126,7 @@ def usuarioDelete(id):
     return redirect(url_for('usuarioList'))
 
 @app.route('/usuarioUpdate/<int:id>', methods=["GET", "POST"])
+@login_required
 def usuarioUpdate(id):
     if request.method == "GET":
         usuario = Usuario.query.filter_by(id=id).first()
@@ -150,28 +151,19 @@ def usuarioUpdate(id):
 
 
 @app.route('/produtoForm')
+@login_required
 def produtoForm():
-    if 'usuario_logado' not in session or session['usuario_logado'] == None:
-        return redirect(url_for('login', proxima=url_for('produtoForm')))
     return render_template('produtoForm.html', titulo='Novo Produto')
 
-#@app.route('/criar', methods=['POST',])
-#def criar():
-    #if 'usuario_logado' not in session or session['usuario_logado'] == None:
-    #    return redirect(url_for('login', proxima=url_for('produtoForm')))
-
-    #nome = request.form['nome']
-    #preco = request.form['preco']
-    #descricao = request.form['descricao']
-    # unid = request.form['unid']
-    #produto = Produto(nome,preco, descricao, unid)
 
 @app.route('/produtoList')
+@login_required
 def produtoList():
     produto = Produto.query.filter_by(id=id).first()
     return render_template('produtoList.html', usuarios = usuarios)
 
 @app.route('/produtoUpdate')
+@login_required
 def produtoUpdate(id):
     return render_template('produtoForm.html', produto = produto)
 
@@ -182,30 +174,38 @@ def home():
 
     return render_template('home.html', titulo='Rei do cangaço')
 
-
-
-
 @app.route('/login', methods=["GET","POST"])
 def login():
     proxima = request.args.get('proxima')
+  
+
+
     return render_template('login.html', proxima = proxima)
 
-@app.route('/autenticar', methods=['POST',])
+@app.route('/autenticar', methods=["GET","POST"])
 def autenticar():
-    usuarios = Usuario.query.all()
-    if request.form['usuario'] in usuarios:
-        usuario = usuarios[request.form['usuario']]
-        if usuario.senha == request.form['senha']:
-            session['usuario_logado'] = usuario.login
-            flash(usuario.login + ' logou com sucesso!')
-            proxima_pagina = request.form['proxima']
-            return redirect (proxima_pagina)
-    else:
-        flash('Login não realizado !')
-        return redirect(url_for('login'))
+    proxima_pagina = request.form['proxima']
+    if request.method=="POST":
+        email = request.form['email']
+        senha = request.form['senha']
+
+        usuario = Usuario.query.filter_by(email = email).first()
+
+        if not usuario:
+            flash("Credenciais inválidas")
+            return redirect(url_for("login"))
+        if not check_password_hash(usuario.senha , senha):
+            flash("Credenciais inválidas")
+            return redirect(url_for("login"))
+
+        login_user(usuario)
+        return redirect(url_for("usuarioRegister"))
+
+    return render_template(url_for("login"))
+
 
 @app.route('/logout')
+@login_required
 def logout():
-    session['usuario_logado'] = None
-    flash('Nenhum usuário logado!')
+    logout_user()
     return redirect (url_for('login'))
