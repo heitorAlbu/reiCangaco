@@ -1,15 +1,16 @@
 {% extends "template.html" %}
 {% block conteudo %}
-      <form  action{{url_for('usuarioRegister')}} method="POST"  >
+      <form  action="/usuarioUpdate/{{usuario.id}}"   method="POST"  >
         <fieldset>
           <div class="form-group">
             <label for="nome">Nome</label>
-            <input type="text" id="nome" name="nome" placeholder="Nome Completo" class="form-control">
+            <input type="text" name="id_usuario" hidden value={{usuario.id}}>
+            <input type="text" id="nome" name="nome" placeholder="Nome Completo" value={{usuario.nome}} class="form-control">
           </div>
           
           <div class="form-group">
             <label for="email">Email</label>
-            <input type="text" id="email" name="email"placeholder="E-mail" class="form-control">
+            <input type="text" id="email" name="email"placeholder="E-mail"value={{usuario.email}}  class="form-control">
           </div>
           <div class="form-group">
             <label for="senha">Senha</label>
@@ -17,19 +18,19 @@
           </div>
           <div class="form-group">
             <label for="senha">Endereço</label>
-            <input type="text" id="endereco" name="endereco"  class="form-control">
+            <input type="text" id="endereco" name="endereco" value={{usuario.endereco}}  class="form-control">
           </div>
           <div class="form-group">
             <label for="telefone">Telefone</label>
-            <input type="text" id="telefone" name="telefone"  class="form-control">
+            <input type="text" id="telefone" name="telefone" value={{usuario.telefone}}  class="form-control">
           </div>
           <div class="form-group">
             <label for="senha">CPF</label>
-            <input type="text" id="cpf" name="cpf"  class="form-control">
+            <input type="text" id="cpf" name="cpf" value={{usuario.cpf}}   class="form-control">
           </div>
           <div class="form-group">
             <label for="senha">Tipo</label>
-            <input type="number" id="tipo" name="tipo"  class="form-control">
+            <input type="number" id="tipo" name="tipo" value={{usuario.tipoUsuario}}  class="form-control">
           </div>
           <button type="submit" class="btn btn-primary btn-salvar">Salvar</button>
           <button type="submit" class="btn btn-secondary btn-salvar">Cancelar</button>
