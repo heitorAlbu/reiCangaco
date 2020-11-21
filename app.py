@@ -177,9 +177,6 @@ def home():
 @app.route('/login', methods=["GET","POST"])
 def login():
     proxima = request.args.get('proxima')
-  
-
-
     return render_template('login.html', proxima = proxima)
 
 @app.route('/autenticar', methods=["GET","POST"])
