@@ -1,0 +1,29 @@
+{% extends "template.html" %}
+{% block conteudo %}
+      <form  action="/fornecedorUpdate/{{fornecedor.id}}"   method="POST"  >
+        <fieldset>
+          <div class="form-group">
+            <label for="nome">Nome</label>
+            <input type="text" name="id_fornecedor" hidden value={{fornecedor.id}}>
+            <input type="text" id="nome" name="nome" placeholder="Nome" value="{{fornecedor.nome}}" class="form-control">
+          </div>
+          
+          <div class="form-group">
+            <label for="senha">Nickname</label>
+            <input type="text" id="nickname" name="nickname" placeholder="nickname" value="{{fornecedor.nickname}}"  class="form-control">
+          </div>
+          <div class="form-group">
+            <label for="cpf">CPF</label>
+            <input type="text" id="cpf" name="cpf" value={{fornecedor.cpf}}  class="form-control">
+          </div>
+          <div class="form-group">
+            <label for="email">CNPJ</label>
+            <input type="text" id="cnpj" name="cnpj" placeholder="cnpj" value={{fornecedor.cnpj}} class="form-control">
+          </div>
+          <button type="submit" class="btn btn-primary btn-salvar">Salvar</button>
+          <button type="submit" class="btn btn-secondary btn-salvar">Cancelar</button>
+        </fieldset>
+      </form>
+     
+
+{% endblock %}

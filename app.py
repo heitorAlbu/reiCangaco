@@ -88,6 +88,13 @@ class Pedido(db.Model):
 if __name__ == "__name__":
     app.run(debug=True)
 
+
+############# [ USUARIO ] #############################
+@app.route('/usuarioForm')
+@login_required
+def usuarioForm():
+    return render_template('usuarioForm.html')
+
 @app.route('/usuarioList')
 @login_required
 def usuarioList():
@@ -149,34 +156,139 @@ def usuarioUpdate(id):
 
         return render_template('usuarioList.html', usuarios = usuarios)
 
+############# [ PRODUTO ] #############################
 
 @app.route('/produtoForm')
 @login_required
 def produtoForm():
-    return render_template('produtoForm.html', titulo='Novo Produto')
+    fornecedores = Fornecedor.query.all()
+    return render_template('produtoForm.html', titulo='Novo Produto', fornecedores=fornecedores)
 
 
 @app.route('/produtoList')
-@login_required
 def produtoList():
-    return render_template('produtoList.html', produto = produtolista)
+    produtos = Produto.query.all()
+    return render_template('produtoList.html', produtos = produtos)
 
-@app.route('/produtoUpdate')
+@app.route('/produtoRegister', methods=["GET", "POST"])
+def produtoRegister():
+    if request.method == "POST":
+        produto = Produto()
+        produto.nome = request.form["nome"]
+        produto.descricao = request.form["descricao"]
+        produto.preco = request.form["preco"]
+        produto.unidVenda = request.form["unidVenda"]
+        produto.fornecedor_produto_id = request.form["listafornecedores"]
+        
+        db.session.add(produto)
+        db.session.commit()
+        produtos = Produto.query.all()
+        return render_template('produtoList.html', produtos = produtos)
+    else:
+        produto = Produto()
+        return render_template('produtoForm.html', produto = produto)
+
+@app.route('/produto/delete/<int:id>')
+@login_required
+def produtoDelete(id):
+    produto = Produto.query.filter_by(id=id).first()
+    db.session.delete(produto)
+    db.session.commit()
+    produtos = Produto.query.all()
+    return redirect(url_for('produtoList'))
+
+@app.route('/produtoUpdate/<int:id>', methods=["GET", "POST"])
 @login_required
 def produtoUpdate(id):
-    return render_template('produtoForm.html', produto = produtolista)
+    if request.method == "GET":
+        produto = Produto.query.filter_by(id=id).first()
+        return render_template('produtoUpdate.html', produto = produto)
+    if request.method == "POST":
+        Id = request.form["id_produto"]
+        produto = Produto.query.filter_by(id=int(Id)).first()
+        produto.nome = request.form["nome"]
+        produto.descricao = request.form["descricao"]
+        produto.preco = request.form["preco"]
+        produto.unidVenda = request.form["unidVenda"] 
+        db.session.commit()
+        produtos = Produto.query.all()
+        return render_template('produtoList.html', produtos = produtos)
 
+############# [ VENDA ] #############################
+
+@app.route('/vendaList')
+@login_required
+def vendaList():
+    return render_template('home.html')
+
+############# [ FORNECEDOR ] #############################
+
+@app.route('/fornecedorForm')
+def fornecedorForm():
+    return render_template('fornecedorForm.html')
+
+@app.route('/fornecedorList')
+@login_required
+def fornecedorList():
+    fornecedores = Fornecedor.query.all()
+    return render_template('fornecedorList.html', fornecedores = fornecedores)
+
+@app.route('/fornecedorUpdate/<int:id>', methods=["GET", "POST"])
+@login_required
+def fornecedorUpdate(id):
+    if request.method == "GET":
+        fornecedor = Fornecedor.query.filter_by(id=id).first()
+        return render_template('fornecedorUpdate.html', fornecedor=fornecedor)
+    if request.method == "POST":
+        Id = request.form["id_fornecedor"]
+        fornecedor = Fornecedor.query.filter_by(id=int(Id)).first()
+        fornecedor.nome = request.form["nome"]
+        fornecedor.nickname = request.form["nickname"]
+        fornecedor.cpf = request.form["cpf"]
+        fornecedor.cnpj = request.form["cnpj"]
+
+        db.session.commit()
+        fornecedores = Fornecedor.query.all()
+
+        return render_template('fornecedorList.html', fornecedores = fornecedores)
+
+
+@app.route('/fornecedor/delete/<int:id>')
+@login_required
+def fornecedorDelete(id):
+    fornecedor = Fornecedor.query.filter_by(id=id).first()
+    db.session.delete(fornecedor)
+    db.session.commit()
+    fornecedores = Fornecedor.query.all()
+    return redirect(url_for('fornecedorList'))
+
+@app.route('/fornecedorRegister', methods=["GET", "POST"])
+def fornecedorRegister():
+    if request.method == "POST":
+        fornecedor = Fornecedor()
+        fornecedor.nome = request.form["nome"]
+        fornecedor.nickname = request.form["nickname"]
+        fornecedor.cpf = request.form["cpf"]
+        fornecedor.cnpj = request.form["cnpj"]
+
+        db.session.add(fornecedor)
+        db.session.commit()
+        fornecedores = Fornecedor.query.all()
+        return render_template("fornecedorList.html", fornecedores = fornecedores)
+    else:
+        fornecedor = Fornecedor()
+        return render_template('fornecedorForm.html', fornecedor=fornecedor)
+
+#############{HOME E LOGIN}
 @app.route('/')
+@login_required
 def home():
-    if 'usuario_logado' not in session or session['usuario_logado'] == None:
-        return redirect(url_for('login', proxima=url_for('produtoForm')))
-
-    return render_template('home.html', titulo='Rei do cangaço')
+    return render_template('home.html', titulo='Rei do cangaço', image_file = url_for('static', filename="usricon.jpg"))
 
 @app.route('/login', methods=["GET","POST"])
 def login():
     proxima = request.args.get('proxima')
-    return render_template('login.html', proxima = proxima)
+    return render_template('login.html', proxima = proxima , image_file = url_for('static', filename="loginbg.png"))
 
 @app.route('/autenticar', methods=["GET","POST"])
 def autenticar():
@@ -193,9 +305,9 @@ def autenticar():
         if not check_password_hash(usuario.senha , senha):
             flash("Credenciais inválidas")
             return redirect(url_for("login"))
-
         login_user(usuario)
-        return redirect(url_for("usuarioRegister"))
+        teste = current_user(usuario.id)
+        return redirect(url_for("home"))
 
     return render_template(url_for("login"))
 

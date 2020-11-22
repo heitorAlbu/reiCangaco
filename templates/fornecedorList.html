@@ -1,0 +1,65 @@
+{% extends "template.html" %}
+{% block conteudo %}
+
+<style>
+
+.wrapper {
+    text-align: center;
+}
+
+.button {
+    position: absolute;
+    top: 50%;
+}
+  table {
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+  }
+  
+  td, th {
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;
+  }
+  
+  tr:nth-child(even) {
+    background-color: #dddddd;
+  }
+</style>
+
+<br>
+<br>
+<div class="wrapper">
+  <form action="{{url_for('fornecedorForm')}}">
+    <h3>Fornecedores</h3>
+    <br>
+    <button type="submit" class="btn btn-primary btn-salvar">Cadastrar Fornecedor</button>
+  </form>
+</div>
+<br>
+
+<table class="table table-borderless">
+  <thead>
+    <tr>
+      <th scope="col">Nome</th>
+      <th scope="col">Nickname</th>
+      <th scope="col">CPF</th>
+      <th scope="col">CNPJ</th>
+    </tr>
+  </thead>
+  <tbody>
+         {% for fornecedor in fornecedores %}
+        <tr>
+            <td>{{fornecedor.nome}}</td>
+            <td>{{fornecedor.nickname}}</td>
+            <td>{{fornecedor.cpf}}</td>
+            <td>{{fornecedor.cnpj}}</td>
+            <td><a href="{{url_for('fornecedorUpdate', id=fornecedor.id)}}">Alterar</a></td> 
+            <td><a href="{{url_for('fornecedorDelete', id=fornecedor.id)}}">Deletar</a></td> 
+        </tr>
+        {% endfor %} 
+  </tbody>
+</table>
+
+{% endblock %}
