@@ -1,7 +1,7 @@
 from app.models import Usuario, Fornecedor, Venda, Pedido, Produto
 from app import db
 from datetime import timedelta
-from flask import render_template, redirect, url_for, request, flash
+from flask import render_template, session, redirect, url_for, request, flash
 from flask_login import login_user, logout_user, login_required
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -132,7 +132,7 @@ def init_app(app):
     @app.route('/vendaList')
     @login_required
     def vendaList():
-        return render_template('home.html')
+        return render_template('vendaFinal.html')
 
     ############# [ FORNECEDOR ] #############################
 
