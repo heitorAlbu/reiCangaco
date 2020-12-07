@@ -158,7 +158,7 @@ def init_app(app):
     ############# [ VENDA ] #############################
     @app.route('/visualizarPerfil')
     @login_required
-<<<<<<< HEAD
+
     def visualizarPerfil():
         return render_template('home.html')
     
