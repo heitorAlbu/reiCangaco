@@ -1,7 +1,7 @@
 from app.models import Usuario, Fornecedor, Venda, Pedido, Produto
 from app import db
 from datetime import timedelta
-from flask import render_template, redirect, url_for, request, flash, jsonify 
+from flask import render_template, redirect, url_for, request, flash, jsonify, session
 from flask_login import login_user, logout_user, login_required
 from flask_cors import CORS, cross_origin
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -158,6 +158,7 @@ def init_app(app):
     ############# [ VENDA ] #############################
     @app.route('/visualizarPerfil')
     @login_required
+<<<<<<< HEAD
     def visualizarPerfil():
         return render_template('home.html')
     
@@ -195,6 +196,11 @@ def init_app(app):
         p1 = venda.produtos
         return render_template('vendaDetalhes.html', venda = venda)
         
+
+    #def vendaList():
+    #    return render_template('vendaFinal.html')
+
+
     ############# [ FORNECEDOR ] #############################
 
     @app.route('/fornecedorForm')

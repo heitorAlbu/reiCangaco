@@ -1,0 +1,93 @@
+{% extends "template.html" %}
+{% block conteudo %}
+
+<style>
+
+  .wrapper {
+      text-align: center;
+  }
+  
+  .button {
+      position: absolute;
+      top: 50%;
+  }
+    table {
+      font-family: arial, sans-serif;
+      border-collapse: collapse;
+      width: 100%;
+    }
+    
+    td, th {
+      border: 1px solid #dddddd;
+      text-align: left;
+      padding: 8px;
+    }
+    
+    tr:nth-child(even) {
+      background-color: #dddddd;
+    }
+</style>
+
+<br>
+<br>
+<div class="wrapper">
+  <form action="{{url_for('produtoForm')}}">
+    <h3>Produtos</h3>
+    <br>
+    <button type="submit" class="btn btn-primary btn-salvar">Cadastrar Produto</button>
+</form>
+</div>
+<br>
+
+<div class="wrapper">
+  <table class="table table-borderless">
+    <thead>
+      <tr>
+        <th scope="col">Id Venda</th>
+        <th scope="col">Data Venda</th>
+        <th scope="col">Valor Total</th>
+      </tr>
+    </thead>
+  
+    <tbody>
+          <tr>
+              <td>V0001</td>
+              <td>15/02/2020</td>
+              <td>1560,00</td>
+          </tr>
+    </tbody>
+  </table>
+  <br>
+  <h3>Produtos</h3>
+  <br>
+  </div>
+
+<div>
+<table class="table table-borderless">
+  <thead>
+    <link rel="stylesheet" type="text/css" href="static/liststyle.css" media="screen" />
+    <tr>
+      <th scope="col">Nome do Produto</th>
+      <th scope="col">Preço</th>
+      <th scope="col">Descrição</th>
+      <th scope="col">Unidade de Venda</th>
+    </tr>
+  </thead>
+  <tbody>
+
+    {% for produto in produtos %}
+    <tr>
+        <td>{{produto.nome}}</td>
+        <td>{{produto.preco}}</td>
+        <td>{{produto.descricao}}</td>
+        <td>{{produto.unidVenda}}</td>
+        <td><a href="{{url_for('produtoUpdate', id=produto.id)}}">Alterar</a></td> 
+        <td><a href="{{url_for('produtoDelete', id=produto.id)}}">Deletar</a></td> 
+    </tr>
+    {% endfor %} 
+
+  </tbody>
+</table>
+</div>
+
+{% endblock %}
