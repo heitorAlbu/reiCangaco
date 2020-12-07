@@ -1,0 +1,181 @@
+{% extends "template.html" %}
+{% block conteudo %}
+       
+
+
+
+            <div class="row mb-3">
+              <select id="listaProd" name="listaProdutos" class=" col-3 form-control" >
+                {% for produto in produtos %}
+                <option value="{{produto.id}}">{{produto.nome}}</option>
+                {% endfor %}
+              </select>
+              <br>
+              <div class="ml-3">
+                  <!-- <label for="ProdPreco">preço unid</label> -->
+                  <input type="text" id="ProdPreco" class="col-4 form-control">
+              </div>
+              
+              <div class="ml-3 row">
+                <button class="btn contador" value="diminui">-</button>
+                <input type="text" id="ProdQtd" name ="ProdQtd" value=1 class="col-3 form-control">
+                <button class="btn contador" value="aumenta">+</button>
+              </div>
+            </div>
+        
+            <div class ="row">
+              <button type="submit" id="btnAdd" class="btn btn-success mr-2 btnCarrinho">Adicionar</button>
+              <button type="button" class="btn btn-secondary btn-salvar">Cancelar</button>
+            </div>
+       
+          <br>
+          <center><button type="button" id="btnFinalizar"class="btn btn-secondary btn-salvar mr-4 btnCarrinho">Finalizar Pedido</button></center>
+          <h1 id="lblTotalText">0.00</h1>
+          <br>
+        
+        <section class="tabela-pedido">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th scope="col">Produto</th>
+                <th scope="col">Preço</th>
+                <th scope="col">Quantidade</th>
+                <th scope="col-11">Total</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </section>
+          
+      
+      <script>
+    $(document).ready(function() {});
+
+
+// EVENTOS ----------------------------
+   $("#listaProd").on("keypress change" , function(){
+      var id= $(this).val()
+      dados = id ;
+      $.post("http://localhost:5000/getProdutos/" , dados, function(data){
+          $("#ProdPreco").val(data.preco);  
+          console.log(data.id)
+      })
+   }); 
+
+   $(".btnCarrinho").on("click", function(){
+    var botao = $(this).text();
+    var venda = [];
+    var linhas = $("tbody>tr");
+    var totalCompra = 0;
+    if(linhas.length > 0){
+
+      linhas.each(function(){
+        var nome = $(this).find("td:nth-child(1)")
+        var preco = $(this).find("td:nth-child(2)")
+        var qtd = $(this).find("td:nth-child(3)")
+        var total = $(this).find("td:nth-child(4)")
+        var id = $(this).find("td:nth-child(5)")
+        totalCompra = totalCompra + parseFloat(total.text())
+  
+        if(botao == "Finalizar Pedido")
+        {
+             var produto = {
+                id: id.text(),
+                nome : nome.text(),
+                preco : preco.text(), 
+                qtd : qtd.text(),
+                total: total.text()
+            }
+            venda.push(produto); 
+            
+        }
+      })
+      if(botao == "Finalizar Pedido"){
+        finalizarPedido(venda)
+      }
+
+      if (botao =="Adicionar"){
+          var valor = $("#ProdPreco").val();
+          var qtd = $("#ProdQtd").val();
+          var totalProduto = parseFloat(valor * qtd);
+          totalCompra = totalCompra + totalProduto
+          $("#lblTotalText").text(totalCompra);
+        }  
+    }else if (botao =="Adicionar"){
+      var valor = $("#ProdPreco").val();
+      var qtd = $("#ProdQtd").val();
+      var totalProduto = parseFloat(valor * qtd).toFixed(2);
+      $("#lblTotalText").text(totalProduto);
+    }
+    else if(botao != "Adicionar") {
+     alert("Não pode realizar venda sem produtos!")
+    }
+   })
+
+   $("#btnAdd").click(function(){
+    adicionarProduto();
+   })
+
+   $(".contador").click(function(){
+      produtoQtd = $("#ProdQtd") 
+      var operacao = $(this).val();
+      var quantidade;
+      if (operacao == "aumenta"){
+          quantidade = parseInt(produtoQtd.val()) + 1
+          produtoQtd.val(quantidade)
+      }
+      else if(operacao == "diminui"){
+          if(parseInt(produtoQtd.val()) > 1){
+            quantidade = parseInt(produtoQtd.val()) - 1
+            produtoQtd.val(quantidade)
+          }
+      }
+   })
+
+//--------------------------------------
+
+   function adicionarProduto(){
+    var corpoTabela = $(".tabela-pedido").find("tbody");
+    var idProduto = $("#listaProd").val()
+    var produto = $( "#listaProd option:selected" ).text(); 
+    var valor = $("#ProdPreco").val();
+    var qtd = $("#ProdQtd").val();
+  
+
+    var totalProduto = parseFloat(valor * qtd).toFixed(2);
+    var total = totalProduto.toString()
+    var linha = novaLinha(idProduto,produto, valor, qtd, total);
+    corpoTabela.prepend(linha);
+   }
+
+   function novaLinha(id,produto,valor, qtd, total){
+      var linha = $("<tr>");
+      var colunaNome = $("<td>").text(produto);
+      var colunaPreco = $("<td>").text(valor);
+      var colunaQtd = $("<td>").text(qtd);
+      var colunaTotal = $("<td>").text(total);
+      var colunaHiddenId = $("<td hidden>").text(id)
+      
+        linha.append(colunaNome);
+        linha.append(colunaPreco);
+        linha.append(colunaQtd);
+        linha.append(colunaTotal);
+        linha.append(colunaHiddenId);
+    return linha;
+   }
+
+   function finalizarPedido(data){
+    $.ajax({
+         url: '/finalizarPedido/',
+         data: JSON.stringify(data),
+         type: "post",
+         contentType: 'application/json;charset=UTF-8',
+         success: function(data){   
+             console.log("OK")
+         } 
+   });
+  }
+      </script>
+     
+
+{% endblock %}

@@ -9,6 +9,7 @@ login_manager = LoginManager()
 def create_app():
     app = Flask(__name__)
     app.config["SECRET_KEY"] = 'secret'
+    app.config['CORS_HEADERS'] = 'Content-Type'
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///db.master' 
 

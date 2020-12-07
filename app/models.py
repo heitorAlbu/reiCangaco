@@ -1,6 +1,6 @@
 from app import db, login_manager
 from flask_login import UserMixin
-
+import json
 
 @login_manager.user_loader
 def current_user(user_id):
@@ -53,6 +53,11 @@ class Produto(db.Model):
 
     def __str__(self):
         return self.nome
+        
+    @staticmethod
+    def from_json(json_string):
+        json_dict = json.loads(json_string)
+
 
 class Venda(db.Model):
     id = db.Column(db.Integer, primary_key=True)

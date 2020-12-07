@@ -6,6 +6,24 @@
     <title>Mercado - Rei do Cangaço</title>
     <link rel="stylesheet" href= "{{ url_for('static', filename='bootstrap.css')}}">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.22/css/jquery.dataTables.css">
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.js"></script>
+
+    <style>
+      #btnFinalizar{
+        background-color: #ec3237 ;
+        border-color: #ec3237;
+        width: 280px;
+        height: 100px;
+        font-size: x-large;
+      }
+      #lblTotalText{
+        color:#ec3237;
+        font-family: Arial, Helvetica, sans-serif;
+      }
+
+    </style>
+
   </head>
 
   <body>
@@ -27,7 +45,13 @@
             <div class="collapse navbar-collapse" id="navbarText">
               <ul class="navbar-nav mr-auto">
                 <li class="nav-item active">
+                  <a class="nav-link" href="{{url_for('visualizarPerfil')}}">Perfil</a>
+                </li>
+                <li class="nav-item active">
                   <a class="nav-link" href="{{url_for('vendaList')}}">Vendas</a>
+                </li>
+                <li class="nav-item active">
+                  <a class="nav-link" href="{{url_for('pedidoForm')}}">Novo Pedido</a>
                 </li>
                 <li class="nav-item active">
                   <a class="nav-link" href="{{url_for('produtoList')}}">Produtos</a>

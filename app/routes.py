@@ -1,9 +1,13 @@
 from app.models import Usuario, Fornecedor, Venda, Pedido, Produto
 from app import db
 from datetime import timedelta
-from flask import render_template, redirect, url_for, request, flash
+from flask import render_template, redirect, url_for, request, flash, jsonify 
 from flask_login import login_user, logout_user, login_required
+from flask_cors import CORS, cross_origin
 from werkzeug.security import check_password_hash, generate_password_hash
+import json, re
+
+from datetime import date
 
 def init_app(app):
     ############# [ USUARIO ] #############################
@@ -19,7 +23,6 @@ def init_app(app):
 
     @app.route('/usuarioRegister', methods=["GET", "POST"])
     def usuarioRegister():
-
         if request.method == "POST":
             usuario = Usuario()
             usuario.nome = request.form["nome"]
@@ -73,6 +76,29 @@ def init_app(app):
             return render_template('usuarioList.html', usuarios = usuarios)
     ############# [ PRODUTO ] #############################
 
+
+    @app.route('/getProdutos/', methods=['POST'])
+    def getProdutos():
+        a = request.get_data('id')
+        a = str(a)
+        id = re.findall(r'[0-9]', a)
+        id = int(id[0])
+        retorno = Produto.query.filter_by(id=id).first()
+        ##retorno = Produto.query.get(id: numero).first()
+                  #Produto.query.filter_by(id=id).first()
+        #lista = Produto.query.all()
+        #retorno = []
+        #for item in lista:
+            #obj = {'id':item.id ,'name': item.nome, 'preco' :item.preco  }
+            #retorno.append(obj)
+         
+        resposta = jsonify({'id': retorno.id,'preco': retorno.preco})
+      
+        resposta.headers.add('Access-Control-Allow-Origin', '*')
+        return resposta
+
+
+
     @app.route('/produtoForm')
     @login_required
     def produtoForm():
@@ -111,6 +137,7 @@ def init_app(app):
         db.session.commit()
         produtos = Produto.query.all()
         return redirect(url_for('produtoList'))
+
     @app.route('/produtoUpdate/<int:id>', methods=["GET", "POST"])
     @login_required
     def produtoUpdate(id):
@@ -129,11 +156,45 @@ def init_app(app):
             return render_template('produtoList.html', produtos = produtos)
 
     ############# [ VENDA ] #############################
-    @app.route('/vendaList')
+    @app.route('/visualizarPerfil')
     @login_required
-    def vendaList():
+    def visualizarPerfil():
         return render_template('home.html')
+    
+    @app.route('/finalizarPedido/',  methods=['POST'])
+    def finalizarPedido():
+        vendaObj = Venda()
+        vendaObj.data = date.today()
+        venda = request.json
+        lista = []
+        totalCompra = 0.0
+        for v in venda:
+            id =  int(v['id'])
+            total = float(v['total'])
+            totalCompra = totalCompra + total
 
+            produto = Produto.query.filter_by(id = id).first()
+            lista.append(produto)
+            
+        vendaObj.produtos = lista
+        vendaObj.total = totalCompra
+        db.session.add(vendaObj)
+        db.session.commit()
+        
+        pass
+    
+    @app.route('/vendaList')
+    def vendaList():
+        listaVendas = Venda.query.all()
+        return render_template('vendaList.html', vendas = listaVendas)
+
+    @app.route('/vendaDetalhes/<int:id>')
+    def vendaDetalhes(id):
+        venda = Venda.query.filter_by(id=int(id)).first()
+       # teste = Venda.query.query(id=int(id)).first().bars
+        p1 = venda.produtos
+        return render_template('vendaDetalhes.html', venda = venda)
+        
     ############# [ FORNECEDOR ] #############################
 
     @app.route('/fornecedorForm')
@@ -192,7 +253,18 @@ def init_app(app):
             fornecedor = Fornecedor()
             return render_template('fornecedorForm.html', fornecedor=fornecedor)
 
-    #############{HOME E LOGIN}
+
+    ############# [ PEDIDO ] #############################
+    @app.route('/pedidoForm', methods=['GET','POST'])
+    #@login_required
+    def pedidoForm():
+        produtos = Produto.query.all()
+        return render_template('pedidoForm.html', produtos= produtos)
+
+
+
+
+    #############{HOME E LOGIN} ##########################
     @app.route('/')
     @login_required
     def home():
@@ -220,8 +292,8 @@ def init_app(app):
                 return redirect(url_for("login"))
 
             login_user(usuario)
-            #teste = current_user(usuario.id)
             return redirect(url_for("home"))
+            
         return render_template(url_for("login"))
 
 
