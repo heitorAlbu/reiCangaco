@@ -171,7 +171,14 @@
          type: "post",
          contentType: 'application/json;charset=UTF-8',
          success: function(data){   
-             console.log("OK")
+          $.ajax({
+            url:'/vendaList',
+            type: "get",
+            contentType: 'application/json;charset=UTF-8',
+          })
+          //alert("renda realizada com sucesso!!")
+          location.reload();
+          //$.get("http://localhost:5000/vendaList/");
          } 
    });
   }
